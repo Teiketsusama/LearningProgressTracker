@@ -5,6 +5,7 @@ students = []
 list_of_ids = []
 students_points = {}
 submission = [0, 0, 0, 0]
+students_notified = []
 
 
 def add_students():
@@ -192,6 +193,44 @@ def display_statistics():
             print("Unknown course.")
 
 
+def notify_students():
+    completion_students = {
+        "Python": [],
+        "DSA": [],
+        "Databases": [],
+        "Flask": []
+    }
+    for student, points in students_points.items():
+        if points["python"] >= 600:
+            index = list_of_ids.index(student)
+            completion_students["Python"].append(students[index])
+        if points["dsa"] >= 400:
+            index = list_of_ids.index(student)
+            completion_students["DSA"].append(students[index])
+        if points["databases"] >= 480:
+            index = list_of_ids.index(student)
+            completion_students["Databases"].append(students[index])
+        if points["flask"] >= 550:
+            index = list_of_ids.index(student)
+            completion_students["Flask"].append(students[index])
+
+    students_to_notify = []
+    for course in completion_students:
+        if len(completion_students[course]) > 0:
+            for student_info in completion_students[course]:
+                if student_info not in students_notified:
+                    students_to_notify.append(student_info)
+                    f_name, l_name, email = student_info
+                    print(f"To: {email}\n"
+                          f"Re: Your Learning Progress\n"
+                          f"Hello, {f_name} {l_name}! You have accomplished our {course} course!")
+
+    unique_students = {frozenset(student): student for student in students_to_notify}
+    num_of_students = len(unique_students)
+    print(f"Total {num_of_students} students have been notified.")
+    students_notified.extend(unique_students.values())
+
+
 def main():
     print("Learning progress tracker")
     while True:
@@ -206,6 +245,8 @@ def main():
             show_points()
         elif user_input == "statistics":
             display_statistics()
+        elif user_input == "notify":
+            notify_students()
         elif user_input == "back":
             print("Enter 'exit' to exit the program.")
         elif user_input == "exit":
@@ -213,7 +254,6 @@ def main():
             exit()
         elif len(user_input) == 0:
             print("No input")
-        # Detect if a user has entered a blank line and print No input in response
         elif str.isspace(user_input):
             print("No input")
         else:
